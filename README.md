@@ -1,7 +1,7 @@
 # 🌍 Daily Kt_CO2 Prediction using Machine Learning
 
 This project was created as part of a **data science competition** focused on analyzing and predicting global air pollution using energy and sustainability datasets.  
-Our team advanced to the **final round (Top 10)** and achieved **8th place overall**, with a **Kaggle score of 2.213**, ranking **10th out of 23 leaderboard submissions**.
+Our team advanced to the **final round (Top 10)** and achieved **8th place overall**, with a **Kaggle score of 2.213**, ranking **8th out of 23 leaderboard submissions**.
 
 ---
 
