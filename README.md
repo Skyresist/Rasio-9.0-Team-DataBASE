@@ -1,73 +1,56 @@
-# 🌍 Daily Kt_CO2 Prediction using Machine Learning
+# Daily CO₂ Emissions Prediction — RASIO 9.0
 
-This project was created as part of a **data science competition** focused on analyzing and predicting global air pollution using energy and sustainability datasets.  
-Our team advanced to the **final round (Top 10)** and achieved **8th place overall**, with a **Kaggle score of 2.213**, ranking **8th out of 23 leaderboard submissions**.
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![LightGBM](https://img.shields.io/badge/Model-LightGBM-2ea44f)
+![Result](https://img.shields.io/badge/Result-8th%20place%20finalist-6f42c1)
 
----
+Team **DataBASE**'s entry for the **RASIO 9.0** data science competition. The task: predict a city's daily CO₂ emissions (`daily_ktCO2`, kilotonnes) from IoT-style urban data — air quality, weather, traffic counts, public-transport ridership and calendar information.
 
-## 🧠 Project Overview
+**Result:** 8th place finalist out of 23 Kaggle leaderboard submissions (Kaggle score 2.213).
 
-The goal of this notebook was to explore how global **energy consumption patterns** influence **air pollution levels** and to build predictive models capable of estimating pollutant concentrations using real-world environmental data.
+## Results
 
----
+Chronological 80/20 split (no shuffling, so the model is always tested on days after the ones it trained on):
 
-## 🔍 Workflow Summary
+| Split | RMSE | R² | NRMSE |
+|---|---:|---:|---:|
+| Train | 1.38 | 0.94 | 4.3% |
+| Test  | 1.95 | 0.77 | 7.0% |
 
-### 1. **Data Cleaning & Preparation**
-- Combined multiple open datasets on air pollution and sustainable energy
-- Standardized country names, years, and measurement units
-- Removed missing and inconsistent entries
+## The data problem
 
-### 2. **Exploratory Data Analysis (EDA)**
-- Identified correlations between energy sources (renewable vs non-renewable) and pollution levels  
-- Visualized country-wise and time-series trends
+The raw training set had **1,606 days × 60 columns** and was deliberately messy. Most of the work was cleaning:
 
-### 3. **Feature Engineering & Preprocessing**
-- Scaled numerical features and encoded categorical variables  
-- Handled multicollinearity and outliers  
-- Selected top predictors for modeling
+- **Sparse columns:** dropped 20 columns with more than 70% missing values (SO₂ and most hourly vehicle counts), keeping `avg_ridership_monthly` and imputing it by month instead.
+- **Redundant features:** removed highly correlated weather variables (`temp_calib`, `feelslikemax`, `feelslikemin`, `rain`) after inspecting a correlation heatmap.
+- **Time-aware imputation:** filled pollutant gaps (PM2.5, PM10, O₃, NO₂) with time-based interpolation on a date index rather than a global mean.
+- **Physically impossible values:** detected out-of-range moon-phase values with physical bounds + IQR, then repaired them with interpolation and a rolling median.
+- **Inconsistent labels:** normalised values like `yEs`, `nO`, `YES` with regex; rebuilt a messy weather `conditions` field into three clean categories; filled missing holiday flags from the official Indonesian holiday calendar.
 
-### 4. **Machine Learning Models**
-Implemented and compared several regressors:
-- `Support Vector Regression (SVR)`
-- `ElasticNet Regression`
-- `Random Forest Regressor`
-- `XGBoost Regressor`
-- `Stacking Ensemble`
+## Features and model
 
-### 5. **Model Evaluation**
-- Evaluated using **RMSE** and **R²** metrics  
-- Ensemble methods provided the most consistent predictions  
-- Final Kaggle score: **2.213**
+- Calendar features: year, month, day of week, weekend flag, holiday flag
+- One-hot encoded weather conditions and seasons
+- Relative PM2.5 (daily value ÷ that month's average)
+- **LightGBM** regressor, evaluated with RMSE, R² and normalised RMSE
 
----
+## What I'd improve
 
-## 🌱 Key Insights
-- Higher renewable energy use generally correlates with **lower PM2.5 and CO₂ levels**
-- Countries dependent on fossil fuels exhibited **higher pollution variability**
-- Ensemble models achieved **stronger generalization** across unseen data
+- The train–test gap (R² 0.94 → 0.77) points to some overfitting; time-series cross-validation and stronger regularisation would give a more reliable estimate.
+- Lag and rolling-window features of past emissions were not used and would likely help.
 
----
+## Files
 
-## 🛠️ Tools & Libraries
-- `Python`, `Pandas`, `NumPy`
-- `Scikit-learn`, `XGBoost`
-- `Matplotlib`, `Seaborn`
-- `Jupyter Notebook`
+| File | Contents |
+|---|---|
+| `Rasio_9.0_DataBASE.ipynb` | Full workflow: cleaning, feature engineering, modelling, evaluation |
+| `datatrain.csv` / `datatest.csv` | Competition data |
+| `submission.csv` | Final Kaggle submission |
 
----
+## Tools
 
-## 🏁 Competition Results
-- 🏆 **Finalist Team (8th out of 10)**
-- 📈 **Kaggle Score: 2.213 (10th/23 leaderboard)**
+Python · pandas · NumPy · scikit-learn · LightGBM · holidays · Matplotlib · Seaborn · Google Colab
 
----
+## Team
 
-## 📂 File Guide
-- `notebook1.ipynb` — Full workflow: data cleaning, EDA, feature engineering, model training, and evaluation.
-
----
-
-## 💡 Summary
-This notebook demonstrates the integration of real-world datasets, data preprocessing, and multiple machine learning models to uncover sustainability-driven insights.  
-It highlights how data science can inform energy policies and contribute toward a cleaner, more sustainable future.
+**DataBASE** — Clayvent Yuuki William, Teresa Tendeas and Kenrich Heavenly Sandria.
